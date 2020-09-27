@@ -1,0 +1,30 @@
+---
+
+- hosts: all
+  name: 'Converge'
+  become: True
+
+  tasks:
+    - import_role:
+        name: 'ansible-role-knot'
+      vars:
+        knot_config:
+          zone:
+            - domain: 'molecule.localdomain'
+
+        knot_zones:
+          - zone: 'molecule.localdomain'
+
+            ttl: 3600
+            soa:
+              mname: 'dns1.molecule.localdomain'
+              rname: 'hostmaster.molecule.localdomain'
+              refresh: 6h
+              retry: 1h
+              expire: 1w
+              minimum: 1d
+
+            records:
+              - type: 'A'
+                name: 'test.molecule.localdomain.'
+                rdata: '172.24.24.24'

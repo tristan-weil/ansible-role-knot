@@ -1,0 +1,7 @@
+---
+
+- name: 'start knot service'
+  service:
+    name: 'knot'
+    enabled: True
+    state: 'started'

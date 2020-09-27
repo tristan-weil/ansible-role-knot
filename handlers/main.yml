@@ -1,0 +1,11 @@
+---
+
+- name: 'knot_restart_handler'
+  service:
+    name: 'knot'
+    state: 'restarted'
+
+- name: 'knot_reload_handler'
+  service:
+    name: 'knot'
+    state: 'reloaded'

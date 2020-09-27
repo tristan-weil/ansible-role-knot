@@ -1,0 +1,96 @@
+---
+
+##############################################################################
+# Configuration
+##############################################################################
+_knot_default_config:
+  server:
+    rundir: "{{ _knot_rundir }}"
+    user: "{{ _knot_user }}:{{ _knot_group }}"
+    listen:
+      - '127.0.0.1@53'
+      - '::1@53'
+
+  log:
+    - target: syslog
+      any: info
+
+  database:
+    storage: "{{ _knot_database }}"
+
+  remote:
+  #  - id: slave
+  #    address: 192.168.1.1@53
+  #
+  #  - id: master
+  #    address: 192.168.2.1@53
+
+  acl:
+  #  - id: acl_slave
+  #    address: 192.168.1.1
+  #    action: transfer
+
+  #  - id: acl_master
+  #    address: 192.168.2.1
+  #    action: notify
+
+  template:
+    - id: default
+      storage: "{{ _knot_database }}"
+      file: "%s.zone"
+
+  zone:
+  #    # Master zone
+  #  - domain: example.com
+  #    notify: slave
+  #    acl: acl_slave
+
+  #    # Slave zone
+  #  - domain: example.net
+  #    master: master
+  #    acl: acl_master
+
+##############################################################################
+# Variables
+##############################################################################
+_knot_pkgs: "{{ _knot_pkgs_by_os_family[ ansible_facts['os_family'] ] }}"
+_knot_root_group: "{{ _knot_root_group_by_os_family[ ansible_facts['os_family'] ] }}"
+_knot_user: "{{ _knot_user_by_os_family[ ansible_facts['os_family'] ] }}"
+_knot_group: "{{ _knot_group_by_os_family[ ansible_facts['os_family'] ] }}"
+_knot_rundir: "{{ _knot_rundir_by_os_family[ ansible_facts['os_family'] ] }}"
+_knot_database: "{{ _knot_database_by_os_family[ ansible_facts['os_family'] ] }}"
+_knot_knotc: "{{ _knot_knotc_by_os_family[ ansible_facts['os_family'] ] }}"
+
+##############################################################################
+# Distributions' dictionaries
+##############################################################################
+_knot_pkgs_by_os_family:
+  Debian:
+    - 'knot'
+    - 'knot-dnsutils'
+  OpenBSD:
+    - 'knot'
+
+_knot_root_group_by_os_family:
+  Debian: 'root'
+  OpenBSD: 'wheel'
+
+_knot_user_by_os_family:
+  Debian: 'knot'
+  OpenBSD: '_knot'
+
+_knot_group_by_os_family:
+  Debian: 'knot'
+  OpenBSD: '_knot'
+
+_knot_rundir_by_os_family:
+  Debian: '/run/knot'
+  OpenBSD: '/var/run/knot'
+
+_knot_database_by_os_family:
+  Debian: '/var/lib/knot'
+  OpenBSD: '/var/db/knot'
+
+_knot_knotc_by_os_family:
+  Debian: '/usr/sbin/knotc'
+  OpenBSD: '/usr/local/sbin/knotc'

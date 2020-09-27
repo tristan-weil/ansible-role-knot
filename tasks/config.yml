@@ -1,0 +1,47 @@
+---
+
+- name: 'update configuration'
+  template:
+    src: 'etc/knot/knot.conf'
+    dest: '/etc/knot/knot.conf'
+    owner: 'root'
+    group: "{{ _knot_group }}"
+    mode: "0640"
+    validate: "{{ _knot_knotc }} -c %s conf-check"
+  notify:
+    - 'knot_restart_handler'
+
+- name: 'check if zone file exists'
+  stat:
+    path: "{{ _knot_database }}/{{ item.zone }}.zone"
+  when: >
+    item.state | default('present') == 'present'
+  loop: "{{ knot_zones }}"
+  register: __knot_zone_exists
+
+- name: 'update zone file'
+  template:
+    src: 'zone/zone.conf'
+    dest: "{{ _knot_database }}/{{ item.item.zone }}.zone"
+    owner: "{{ _knot_user }}"
+    group: "{{ _knot_group }}"
+    mode: "0640"
+  when: >
+    item.item.state | default('present') != 'absent'
+    and (
+      (item.stat is defined and not item.stat.exists and item.item.state | default('present') == 'present')
+      or item.item.state | default('present') == 'force'
+    )
+  loop: "{{ __knot_zone_exists.results }}"
+  notify:
+    - 'knot_reload_handler'
+
+- name: 'delete zone file'
+  file:
+    path: "{{ _knot_database }}/{{ item.zone }}.zone"
+    state: 'absent'
+  when: >
+    item.state | default('present') == 'absent'
+  loop: "{{ knot_zones }}"
+  notify:
+    - 'knot_reload_handler'

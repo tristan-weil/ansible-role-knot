@@ -1,0 +1,17 @@
+---
+
+- include_role:
+    name: 'ansible-role-pkg_config'
+  vars:
+    pkg_config_apt_sources_list_path: '/etc/apt/sources.list.d/knot.sources'
+    pkg_config_apt_sources_list_repos:
+      - uri: 'https://deb.knot-dns.cz/knot-latest/'
+        suites: "{{ ansible_facts['distribution_release'] }}"
+        components: 'main'
+    pkg_config_apt_key_urls:
+      - url: 'https://deb.knot-dns.cz/knot-latest/apt.gpg'
+
+- include_role:
+    name: 'ansible-role-pkg'
+  vars:
+    pkg_list: "{{ _knot_pkgs }}"

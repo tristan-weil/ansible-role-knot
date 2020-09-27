@@ -1,0 +1,21 @@
+---
+
+- hosts: all
+  name: 'Verify'
+  become: True
+  gather_facts: True
+
+  tasks:
+    - name: 'Check the service is enabled/started'
+      service:
+        name: 'knot'
+        enabled: True
+        state: 'started'
+      register: __verify
+      failed_when: __verify.changed
+
+    - name: 'Verify dig case1'
+      shell: |
+        kdig @127.0.0.1 test.molecule.localdomain | grep -q "172.24.24.24"
+      register: __verify_cmd
+      failed_when: __verify_cmd.rc != 0

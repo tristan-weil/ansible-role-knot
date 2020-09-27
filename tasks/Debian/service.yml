@@ -1,0 +1,8 @@
+---
+
+- name: 'start knot service'
+  systemd:
+    name: 'knot'
+    enabled: True
+    daemon_reload: True
+    state: 'started'
